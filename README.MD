@@ -4,19 +4,24 @@ Automates installation and updates for a standard dev toolset on Windows via win
 
 ## Tools Managed
 
-| Tool        | winget ID                    |
-|-------------|------------------------------|
-| PowerShell  | Microsoft.PowerShell         |
-| VS Code     | Microsoft.VisualStudioCode   |
-| Terraform   | Hashicorp.Terraform          |
-| cURL        | cURL.cURL                    |
-| SOPS        | SecretsOPerationS.SOPS       |
+| Tool        | winget ID                    | Notes                                    |
+|-------------|------------------------------|------------------------------------------|
+| PowerShell  | Microsoft.PowerShell         |                                          |
+| VS Code     | Microsoft.VisualStudioCode   |                                          |
+| Git         | Git.Git                      |                                          |
+| Azure CLI   | Microsoft.AzureCLI           |                                          |
+| Terraform   | Hashicorp.Terraform          |                                          |
+| OpenTofu    | OpenTofu.Tofu                |                                          |
+| OpenSSL     | ShiningLight.OpenSSL.Light   | PATH automatically prepended             |
+| cURL        | cURL.cURL                    |                                          |
+| SOPS        | SecretsOPerationS.SOPS       |                                          |
 
 ## Scripts
 
 ### `Install-DevTools.ps1`
 One-time setup for a new machine. Installs all tools silently via winget.
 - VS Code is installed as a system-wide install (`--scope machine`)
+- OpenSSL's bin directory is prepended to the system PATH automatically (winget's silent install skips the PATH checkbox, and bundled versions from tools like ServiceNow agent can otherwise take precedence)
 - Safe to re-run — already-installed tools are skipped without error
 
 ### `Setup-UpdateTask.ps1`
