@@ -13,6 +13,7 @@ Automates installation and updates for a standard dev toolset on Windows via win
 | Terraform   | Hashicorp.Terraform          |                                          |
 | OpenTofu    | OpenTofu.Tofu                |                                          |
 | OpenSSL     | ShiningLight.OpenSSL.Light   | PATH automatically prepended             |
+| nano        | GNU.nano                     |                                          |
 | cURL        | cURL.cURL                    |                                          |
 | SOPS        | SecretsOPerationS.SOPS       |                                          |
 

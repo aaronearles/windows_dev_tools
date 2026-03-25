@@ -3,7 +3,7 @@
 .SYNOPSIS
     Installs dev tools via winget on a new machine.
 .DESCRIPTION
-    Installs PowerShell, VS Code (system), Git, Azure CLI, Terraform, OpenTofu, OpenSSL, cURL, and SOPS.
+    Installs PowerShell, VS Code (system), Git, Azure CLI, Terraform, OpenTofu, OpenSSL, nano, cURL, and SOPS.
     Run this once on a new machine, then run Setup-UpdateTask.ps1 to register
     the weekly auto-update scheduled task.
 #>
@@ -16,6 +16,7 @@ $tools = @(
     @{ Name = "Terraform";       Id = "Hashicorp.Terraform" },
     @{ Name = "OpenTofu";        Id = "OpenTofu.Tofu" },
     @{ Name = "OpenSSL";         Id = "ShiningLight.OpenSSL.Light" },
+    @{ Name = "nano";            Id = "GNU.nano" },
     @{ Name = "cURL";            Id = "cURL.cURL" },
     @{ Name = "SOPS";            Id = "SecretsOPerationS.SOPS" }
 )

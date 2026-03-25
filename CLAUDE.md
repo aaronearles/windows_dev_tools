@@ -9,7 +9,7 @@ This repository automates Windows dev tool installation and updates via winget. 
 ## Architecture
 
 - **Install-DevTools.ps1**: One-time setup script that installs all tools via winget
-  - Installs: PowerShell, VS Code (system-wide), Git, Azure CLI, Terraform, OpenTofu, OpenSSL, cURL, SOPS
+  - Installs: PowerShell, VS Code (system-wide), Git, Azure CLI, Terraform, OpenTofu, OpenSSL, nano, cURL, SOPS
   - VS Code specifically uses `--scope machine` for system install
   - OpenSSL bin directory is prepended to Machine PATH after installation (silent install skips PATH checkbox; prepending ensures it takes precedence over bundled versions like ServiceNow agent)
   - Exit code -1978335189 indicates already installed (treated as success)
@@ -59,5 +59,5 @@ When adding a new tool, it must be added to BOTH scripts:
 
 - **VS Code** requires `--scope machine` to ensure system-wide installation (handled in Install-DevTools.ps1 only, not needed for upgrades)
 - **OpenSSL** bin directory (`C:\Program Files\OpenSSL-Win64\bin`) is prepended to Machine PATH after installation. This ensures the winget-installed version takes precedence over bundled versions (e.g., ServiceNow agent). The PATH fix only runs if the directory exists and isn't already in PATH.
-- **Scheduled task** uses resolved winget path to avoid PATH environment issues
+- **Scheduled task** wraps winget in `powershell.exe -NonInteractive` to inherit the auto-elevated session and suppress UAC prompts. Uses the real winget binary resolved from `$env:ProgramFiles\WindowsApps\Microsoft.DesktopAppInstaller_*\winget.exe` — the `WindowsApps\winget.exe` alias returned by `Get-Command` is a reparse point that only works in interactive sessions and fails in scheduled tasks.
 - **Safe to re-run**: Both scripts handle existing installations/tasks gracefully
