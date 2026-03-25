@@ -3,32 +3,38 @@
 .SYNOPSIS
     Registers (or updates) the AutoUpdate-DevTools scheduled task.
 .DESCRIPTION
-    Sets up a weekly silent winget upgrade task for PowerShell, VS Code, Git, Azure CLI,
-    Terraform, OpenTofu, OpenSSL, cURL, and SOPS. Safe to re-run — will update the task if it
-    already exists.
+    Sets up a weekly silent winget upgrade task for all tools. VS Code is upgraded last
+    so other tools update even if VS Code is running and its installer fails.
 #>
 
 $taskName = "AutoUpdate-DevTools"
 
-# Resolve full winget path so the task works without PATH in its environment
-$wingetPath = (Get-Command winget -ErrorAction Stop | Select-Object -ExpandProperty Source)
+# Resolve the real winget binary from the DesktopAppInstaller package directory.
+# Get-Command returns the app execution alias in WindowsApps, which is a reparse point
+# that only works in interactive sessions and fails in scheduled tasks.
+$wingetPath = Resolve-Path "${env:ProgramFiles}\WindowsApps\Microsoft.DesktopAppInstaller_*\winget.exe" -ErrorAction Stop |
+    Sort-Object Path | Select-Object -Last 1 -ExpandProperty Path
 Write-Host "Using winget at: $wingetPath" -ForegroundColor Cyan
 
 $packages = @(
     "Microsoft.PowerShell",
-    "Microsoft.VisualStudioCode",
     "Git.Git",
     "Microsoft.AzureCLI",
     "Hashicorp.Terraform",
     "OpenTofu.Tofu",
     "ShiningLight.OpenSSL.Light",
+    "GNU.nano",
     "cURL.cURL",
-    "SecretsOPerationS.SOPS"
+    "SecretsOPerationS.SOPS",
+    # VS Code last — installer fails if it's running, so other tools update regardless
+    "Microsoft.VisualStudioCode"
 )
 
 $argString = "upgrade --silent --accept-source-agreements --accept-package-agreements " + ($packages -join " ")
 
-$action = New-ScheduledTaskAction -Execute $wingetPath -Argument $argString
+$action = New-ScheduledTaskAction `
+    -Execute "powershell.exe" `
+    -Argument "-NonInteractive -Command `"& '$wingetPath' $argString`""
 
 $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 9am
 
