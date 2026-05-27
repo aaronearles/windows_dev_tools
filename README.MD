@@ -51,3 +51,18 @@ Both scripts require an elevated (admin) PowerShell session.
 2. Add the ID to the `$tools` array in `Install-DevTools.ps1`
 3. Add the same ID to the `$packages` array in `Setup-UpdateTask.ps1`
 4. Re-run `Setup-UpdateTask.ps1` to update the scheduled task
+
+## Inspecting the Scheduled Task Command
+
+The task action uses `-EncodedCommand` (Base64 UTF-16LE) rather than a plain `-Command` string for two reasons:
+
+- **Quoting** — the command chains two statements with `;` and calls `Resolve-Path` with a `*` glob. Embedding that inline inside the nested quotes required by `-Command "& '...' ..."` is fragile and breaks under the Task Scheduler XML parser.
+- **Special characters** — `;` and `*` can be misinterpreted at the argument-parsing layer depending on quoting context. Base64 encoding sidesteps all of that.
+
+To read the actual command stored in the task:
+
+```powershell
+$task = Get-ScheduledTask -TaskName "AutoUpdate-DevTools"
+$encoded = ($task.Actions[0].Arguments -replace '.*-EncodedCommand\s+', '')
+[System.Text.Encoding]::Unicode.GetString([Convert]::FromBase64String($encoded))
+```
