@@ -5,16 +5,12 @@
 .DESCRIPTION
     Sets up a weekly silent winget upgrade task for all tools. VS Code is upgraded last
     so other tools update even if VS Code is running and its installer fails.
+
+    The task resolves the winget path at runtime so DesktopAppInstaller version updates
+    do not break the task (a hardcoded version path becomes invalid after each update).
 #>
 
 $taskName = "AutoUpdate-DevTools"
-
-# Resolve the real winget binary from the DesktopAppInstaller package directory.
-# Get-Command returns the app execution alias in WindowsApps, which is a reparse point
-# that only works in interactive sessions and fails in scheduled tasks.
-$wingetPath = Resolve-Path "${env:ProgramFiles}\WindowsApps\Microsoft.DesktopAppInstaller_*\winget.exe" -ErrorAction Stop |
-    Sort-Object Path | Select-Object -Last 1 -ExpandProperty Path
-Write-Host "Using winget at: $wingetPath" -ForegroundColor Cyan
 
 $packages = @(
     "Microsoft.PowerShell",
@@ -30,11 +26,17 @@ $packages = @(
     "Microsoft.VisualStudioCode"
 )
 
-$argString = "upgrade --silent --accept-source-agreements --accept-package-agreements " + ($packages -join " ")
+$ArgString = "upgrade --silent --accept-source-agreements --accept-package-agreements " + ($packages -join " ")
+
+# Resolve winget at task run time (not registration time) so the task survives
+# DesktopAppInstaller self-updates that change the versioned directory name.
+# Single-quoted string prevents $WingetPath from expanding at registration time.
+$Command = '$WingetPath = Resolve-Path "C:\Program Files\WindowsApps\Microsoft.DesktopAppInstaller_*\winget.exe" | Sort-Object Path | Select-Object -Last 1 -ExpandProperty Path; & $WingetPath ' + $ArgString
+$EncodedCommand = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes($Command))
 
 $action = New-ScheduledTaskAction `
     -Execute "powershell.exe" `
-    -Argument "-NonInteractive -Command `"& '$wingetPath' $argString`""
+    -Argument "-NonInteractive -EncodedCommand $EncodedCommand"
 
 $trigger = New-ScheduledTaskTrigger -Weekly -DaysOfWeek Monday -At 9am
 
