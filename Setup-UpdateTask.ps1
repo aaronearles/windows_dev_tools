@@ -22,6 +22,7 @@ $packages = @(
     "GNU.nano",
     "cURL.cURL",
     "SecretsOPerationS.SOPS",
+    "GitHub.cli",
     # VS Code last — installer fails if it's running, so other tools update regardless
     "Microsoft.VisualStudioCode"
 )

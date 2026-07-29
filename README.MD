@@ -16,6 +16,7 @@ Automates installation and updates for a standard dev toolset on Windows via win
 | nano        | GNU.nano                     |                                          |
 | cURL        | cURL.cURL                    |                                          |
 | SOPS        | SecretsOPerationS.SOPS       |                                          |
+| GitHub CLI  | GitHub.cli                   |                                          |
 
 ## Scripts
 
