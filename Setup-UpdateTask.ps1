@@ -23,6 +23,7 @@ $packages = @(
     "cURL.cURL",
     "SecretsOPerationS.SOPS",
     "GitHub.cli",
+    "jqlang.jq",
     # VS Code last — installer fails if it's running, so other tools update regardless
     "Microsoft.VisualStudioCode"
 )

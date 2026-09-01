@@ -20,6 +20,7 @@ $tools = @(
     @{ Name = "cURL";            Id = "cURL.cURL" },
     @{ Name = "SOPS";            Id = "SecretsOPerationS.SOPS" },
     @{ Name = "GitHub CLI";      Id = "GitHub.cli" }
+    @{ Name = "JQ";              Id = "jqlang.jq"}
 )
 
 $commonArgs = "--silent --accept-source-agreements --accept-package-agreements"
